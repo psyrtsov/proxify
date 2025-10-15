@@ -73,11 +73,6 @@ func ProxyHandler(c *gin.Context) {
 
 	// determine if response is a stream
 	if isStreamResponse(resp) {
-		// stream heartbeat
-		if os.Getenv("STREAM_HEARTBEAT_ENABLED") == "true" {
-			stream.Heartbeat(c)
-		}
-
 		// stream copy with optional smoothing
 		if os.Getenv("STREAM_SMOOTHING_ENABLED") == "true" {
 			stream.Smoothing(c, resp)

@@ -3,8 +3,10 @@ package stream
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -48,7 +50,7 @@ func readUpstreamChunks(ctx context.Context, body io.ReadCloser) <-chan chunk {
 
 			select {
 			case <-ctx.Done():
-				logger.Info("client disconnected, stop reading upstream")
+				logger.Warn("client disconnected, stop reading upstream")
 				return
 			case ch <- chunk{body: line}:
 			}
@@ -93,6 +95,7 @@ func applyFlowControl(ctx context.Context, in <-chan chunk) <-chan chunk {
 			}
 			select {
 			case <-ctx.Done():
+				logger.Warn("client disconnected, stop buffering")
 				return
 			case buf <- ck:
 			}
@@ -122,9 +125,7 @@ func applyFlowControl(ctx context.Context, in <-chan chunk) <-chan chunk {
 		for {
 			select {
 			case <-ctx.Done():
-				if debugLog {
-					logger.Infof("[FlowControl] Client disconnected, stopping flow control goroutine")
-				}
+				logger.Warn("[FlowControl] Client disconnected, stopping flow control goroutine")
 				return
 
 			case ck, ok := <-buf:
@@ -176,6 +177,7 @@ func applyFlowControl(ctx context.Context, in <-chan chunk) <-chan chunk {
 				select {
 				case <-ticker.C:
 				case <-ctx.Done():
+					logger.Warn("[FlowControl] Client disconnected, stop streaming")
 					return
 				}
 				out <- ck
@@ -238,9 +240,6 @@ func writeToClient(c *gin.Context, resp *http.Response, out <-chan chunk) {
 			w.Header().Add(k, v)
 		}
 	}
-
-	// setting Transfer-Encoding: chunked（stream push）
-	// w.Header().Set("Transfer-Encoding", "chunked")
 	w.WriteHeader(resp.StatusCode)
 
 	flusher, ok := w.(http.Flusher)
@@ -250,21 +249,35 @@ func writeToClient(c *gin.Context, resp *http.Response, out <-chan chunk) {
 		return
 	}
 
-	// === 2. Loop to send chunks ===
+	// === 2. Heartbeat config ===
+	heartbeatEnabled := os.Getenv("STREAM_HEARTBEAT_ENABLED") == "true"
+	pingInterval := 1 * time.Second
+	var lastPing time.Time
+	if heartbeatEnabled {
+		lastPing = time.Now() // start counting from now
+	}
+
+	// === 3. Loop to send chunks and heartbeat ===
 	start := time.Now()
 	chunkCount := 0
 
 	for {
+		var timeout <-chan time.Time
+		if heartbeatEnabled {
+			timeout = time.After(time.Until(lastPing.Add(pingInterval)))
+		}
+
 		select {
 		case <-ctx.Done():
-			logger.Infof("[Downstream] Client disconnected, stopping push")
+			logger.Warn("[Downstream] Client disconnected, stopping push")
 			return
+
 		case ck, ok := <-out:
 			if !ok {
 				logger.Infof("[Downstream] Push complete, total %d chunks, duration %v", chunkCount, time.Since(start))
 				return
 			}
-
+			// write chunk to client
 			_, err := w.Write(ck.body)
 			if err != nil {
 				logger.Errorf("[Downstream] Write failed: %v", err)
@@ -272,6 +285,15 @@ func writeToClient(c *gin.Context, resp *http.Response, out <-chan chunk) {
 			}
 			flusher.Flush()
 			chunkCount++
+
+		case <-timeout: // strict independent heartbeat
+			msg := fmt.Sprintf(": ping - %d\n\n", time.Now().Unix())
+			if _, err := w.Write([]byte(msg)); err != nil {
+				return
+			}
+			logger.Debugf("[Heartbeat] Sent heartbeat: %s", msg)
+			flusher.Flush()
+			lastPing = time.Now()
 		}
 	}
 }
