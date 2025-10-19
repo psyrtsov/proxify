@@ -51,7 +51,7 @@ func Extractor() gin.HandlerFunc {
 		}
 
 		if !found {
-			logger.Error("Route not found: " + top)
+			logger.Warnf("Route not found: " + top)
 			response.RespondTopRouteNotFoundError(c)
 			c.Abort()
 			return

@@ -13,9 +13,9 @@ func SetRoutes(r *gin.Engine) {
 	r.Use(middleware.GinRequestLogger())
 	r.Use(middleware.Extractor())
 
-	// ==== reserved routes ====
 	r.GET("/", controller.HomeHandler)
 
+	// ==== routes.json ====
 	apiGroup := r.Group("/api")
 	{
 		apiGroup.GET("/", controller.ShowPathHandler)
@@ -23,6 +23,8 @@ func SetRoutes(r *gin.Engine) {
 		apiGroup.GET("/param", controller.ShowParamHandler)
 	}
 
-	// ==== routes.json ====
-	r.NoRoute(controller.ProxyHandler)
+	// ==== no routes ====
+	r.NoRoute(func(c *gin.Context) {
+		controller.ProxyHandler(c)
+	})
 }
