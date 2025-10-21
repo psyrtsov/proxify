@@ -42,8 +42,8 @@ COPY . .
 COPY --from=frontend-builder /app/web/dist ./web/dist
 
 # debug
-COPY routes.json ./
-COPY .env ./
+# COPY routes.json ./
+# COPY .env ./
 
 # Build binary
 RUN go build -o /app/bin/proxify .

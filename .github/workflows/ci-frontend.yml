@@ -2,9 +2,9 @@ name: CI-Frontend
 
 on:
   workflow_dispatch:         
-  push:
-    tags:
-      - 'v*'                
+  # push:
+  #   tags:
+  #     - 'v*'                
 
 env:                         
   APP_NAME: proxify_web          

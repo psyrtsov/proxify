@@ -1,26 +1,27 @@
-name: CI-Backend
+name: CI-Build-and-Deploy
 
 on:
-  workflow_dispatch:        
-  # push:
-  #   tags:
-  #     - 'v*'                  
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'    
 
-env:                       
-  APP_NAME: proxify        
-  REMOTE_DIR: /www/wwwroot/proxify.poixe.com/ci  
-  PROJECT_SUBDIR: backend            
+env:
+  APP_NAME: proxify
+  REMOTE_DIR: /www/wwwroot/proxify.poixe.com/ci
+  PROJECT_SUBDIR: backend
 
 jobs:
-# ---------------------------------------------------------------- Build & Release
+# --------------------------------------------------------------- Build & Release
   build:
     runs-on: ubuntu-latest
     outputs:
-      tag: ${{ github.ref_name }}    
+      tag: ${{ github.ref_name }}
 
     steps:
       - uses: actions/checkout@v4
 
+      # ---- ensure run is based on tag
       - name: Ensure run is based on tag
         run: |
           echo "GITHUB_REF=$GITHUB_REF"
@@ -29,31 +30,49 @@ jobs:
             exit 1
           fi
 
+      # ---- set up Go
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.24'
 
-      - name: Build binary
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # ---- run build.sh
+      - name: Run build.sh
         run: |
-          cd .
-          go build -o "$APP_NAME" main.go
+          chmod +x ./build.sh
+          ./build.sh
 
-      - name: Create Release & upload binary
+      # ---- ensure build output
+      - name: Verify build output
+        run: |
+          echo "[INFO] Listing ./bin contents:"
+          ls -lah ./bin
+          if [ ! -f "./bin/${APP_NAME}" ]; then
+            echo "[ERROR] Binary not found!"
+            exit 1
+          fi
+
+      # ---- create GitHub Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: ./${{ env.APP_NAME }}
+          files: ./bin/${{ env.APP_NAME }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
 
-# ---------------------------------------------------------------- Deploy
+# --------------------------------------------------------------- Deploy
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: success()                     
-    concurrency: production            
+    if: success()
+    concurrency: production
 
     steps:
       - uses: actions/checkout@v4
@@ -61,15 +80,6 @@ jobs:
           sparse-checkout: |
             deploy.sh
           sparse-checkout-cone-mode: false
-
-      - name: Verify deploy.sh exists
-        run: |
-          echo "[INFO] Files in workspace:"
-          ls -lah
-          if [ ! -f "deploy.sh" ]; then
-            echo "[ERROR] deploy.sh not found!"
-            exit 1
-          fi
 
       - name: Upload deploy.sh
         uses: appleboy/scp-action@v1.0.0
@@ -79,12 +89,10 @@ jobs:
           key:      ${{ secrets.SSH_PRIVATE_KEY }}
           port:     ${{ secrets.SSH_PORT || '22' }}
           source:   "deploy.sh"
-          target:   "${{ env.REMOTE_DIR }}/${{ env.PROJECT_SUBDIR }}" # note!
-          # strip_components: 1
+          target:   "${{ env.REMOTE_DIR }}/${{ env.PROJECT_SUBDIR }}"
           overwrite: true
-          debug: true
 
-      - name: Run deploy script
+      - name: Run deploy.sh remotely
         uses: appleboy/ssh-action@v1.2.2
         with:
           host:     ${{ secrets.SSH_HOST }}
@@ -94,9 +102,6 @@ jobs:
           envs:     APP_NAME,REMOTE_DIR,PROJECT_SUBDIR
           script: |
             cd "${REMOTE_DIR}/${PROJECT_SUBDIR}"
-            echo "[INFO] Current dir: $(pwd)"
-            echo "[INFO] Files here:"
-            ls -lah
             chmod +x deploy.sh
-            VERSION="${{ needs.build.outputs.tag }}"    
+            VERSION="${{ needs.build.outputs.tag }}"
             ./deploy.sh "$APP_NAME" "$VERSION"
