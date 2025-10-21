@@ -4,6 +4,9 @@
   </a>
   <h1>Proxify</h1>
   <p>一个开源、轻量、自托管的 AI 接口反向代理网关</p>
+
+  [English](./README.md) / 简体中文
+  
   <p>
     <strong>支持 OpenAI、Anthropic (Claude)、Google (Gemini)、DeepSeek 等几乎所有主流 AI 模型厂商</strong>
   </p>
@@ -351,6 +354,17 @@ Proxify 支持代理任何 HTTP 服务。以下是一些预设的、经过优化
 | **火山引擎** | `/volcengine`   | `https://ark.cn-beijing.volces.com`         |
 
 _注意：实际可用路径取决于您的 `routes.json` 配置文件。_
+
+### 🔍 查看当前演示站支持的端口
+
+您可以通过以下接口实时查看演示站当前配置的代理端口列表：
+
+```bash
+GET https://proxify.poixe.com/api/routes
+````
+
+👉 [点击查看演示站当前支持的端口](https://proxify.poixe.com/api/routes)
+
 
 ## 🤝 贡献
 
