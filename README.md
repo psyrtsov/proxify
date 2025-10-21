@@ -1,9 +1,9 @@
 <div align="center">
   <a href="https://github.com/poixeai/proxify">
-    <img src="https://proxify.poixe.com/x.svg" alt="Proxify Logo" width="100" height="100">
+    <img src="./web/public/x.svg" alt="Proxify Logo" width="100" height="100">
   </a>
   <h1>Proxify</h1>
-  <p>一个开源、轻量、高性能的 AI 接口反向代理网关</p>
+  <p>一个开源、轻量、自托管的 AI 接口反向代理网关</p>
   <p>
     <strong>支持 OpenAI、Anthropic (Claude)、Google (Gemini)、DeepSeek 等几乎所有主流 AI 模型厂商</strong>
   </p>
@@ -21,13 +21,22 @@
       <img alt="Issues" src="https://img.shields.io/github/issues/poixeai/proxify?style=for-the-badge&logo=github">
     </a>
   </p>
+
   <h4>
     <a href="https://proxify.poixe.com">官方网站</a>
     <span> · </span>
-    <a href="https://github.com/poixeai/proxify">查看源码</a>
+    <a href="#-快速开始">快速开始</a>
     <span> · </span>
-    <a href="https://github.com/poixeai/proxify/issues/new">报告 Bug</a>
+    <a href="#-部署教程">部署教程</a>
+    <span> · </span>
+    <a href="#-广泛兼容的-api-端点">支持端点</a>
+    <span> · </span>
+    <a href="#-贡献">贡献</a>
+    <span> · </span>
+    <a href="#-开源协议">开源协议</a>
   </h4>
+  
+  <img src="./assets/images/home_zh_bg.png" alt="Proxify Logo">
 </div>
 
 ---
@@ -36,32 +45,32 @@
 
 ## ✨ 功能特性
 
-*   💎 **强大扩展能力**：不仅是 AI 接口网关，Proxify 也是一个通用的反向代理服务器。我们对 LLM API 做了专项优化，包括流式传输、心跳保活、尾部冲刺等。
+- 💎 **强大扩展能力**：不仅是 AI 接口网关，Proxify 也是一个通用的反向代理服务器。我们对 LLM API 做了专项优化，包括流式传输、心跳保活、尾部冲刺等。
 
-*   🚀 **统一 API 入口**：通过一级路径即可路由到不同上游，例如 `/openai` → `api.openai.com`，`/gemini` → `generativelanguage.googleapis.com`。所有路由规则一处配置，简单高效。
+- 🚀 **统一 API 入口**：通过一级路径即可路由到不同上游，例如 `/openai` → `api.openai.com`，`/gemini` → `generativelanguage.googleapis.com`。所有路由规则一处配置，简单高效。
 
-*   ⚡ **轻量与高性能**：后端采用 Golang 构建，原生支持高并发，资源占用极低。在 0.5 GB 内存的服务器上也能轻松流畅运行。
+- ⚡ **轻量与高性能**：后端采用 Golang 构建，原生支持高并发，资源占用极低。在 0.5 GB 内存的服务器上也能轻松流畅运行。
 
-*   🚄 **极致流式优化**：
+- 🚄 **极致流式优化**：
 
-    *   **平滑输出**：内置流控器，将大模型快速生成的文本块平滑地以“打字机”效果流式传输给客户端。
+  - **平滑输出**：内置流控器，将大模型快速生成的文本块平滑地以“打字机”效果流式传输给客户端。
 
-    *   **心跳维持**：在 SSE (Server-Sent Events) 流中自动插入心跳消息，有效防止因网络空闲导致的连接意外中断。
-    *   **尾部冲刺**：在保障丝滑输出的同时，通过尾部冲刺技术将最坏延迟控制在可接受范围，优化最终响应时间。
+  - **心跳维持**：在 SSE (Server-Sent Events) 流中自动插入心跳消息，有效防止因网络空闲导致的连接意外中断。
+  - **尾部冲刺**：在保障丝滑输出的同时，通过尾部冲刺技术将最坏延迟控制在可接受范围，优化最终响应时间。
 
-*   🛡️ **安全与隐私**：自托管部署，所有请求数据完全在您自己的掌控之下，不经过任何第三方服务器，彻底杜绝隐私泄露风险。
+- 🛡️ **安全与隐私**：自托管部署，所有请求数据完全在您自己的掌控之下，不经过任何第三方服务器，彻底杜绝隐私泄露风险。
 
-*   🌐 **广泛兼容性**：已预置 OpenAI、Azure、Claude、Gemini、DeepSeek 等主流 AI 服务商的路由，同时支持通过配置文件便捷地横向扩展到任意 API。
+- 🌐 **广泛兼容性**：已预置 OpenAI、Azure、Claude、Gemini、DeepSeek 等主流 AI 服务商的路由，同时支持通过配置文件便捷地横向扩展到任意 API。
 
-*   🔧 **极致易用**：从现有服务切换到 Proxify，通常只需修改一行 `baseURL` 配置，无需改动任何业务代码或请求参数。
+- 🔧 **极致易用**：从现有服务切换到 Proxify，通常只需修改一行 `BaseURL` 配置，无需改动任何业务代码或请求参数。
 
-*   👨‍💻 **开源与专业**：项目由 AI 领域资深团队设计与维护，代码完全开源、透明可审计，杜绝供应商锁定，欢迎社区贡献（PRs / Issues）。
+- 👨‍💻 **开源与专业**：项目由 AI 领域一支年轻且富有经验的团队设计与维护，代码完全开源、透明可审计，杜绝供应商锁定，欢迎社区贡献（PRs / Issues）。
 
 ## 🛠️ 技术栈
 
-*   **后端网关**: Golang + Gin
+- **后端网关**: Golang + Gin
 
-*   **前端面板**: React + Vite + TypeScript + Tailwind CSS
+- **前端面板**: React + Vite + TypeScript + Tailwind CSS
 
 ## 🚀 快速开始
 
@@ -88,141 +97,268 @@
 ```javascript
 // Node.js example using /openai proxy endpoint
 import OpenAI from "openai";
-const openai = new OpenAI({ 
-    // highlight-start
-    apiKey: "sk-...", // 您的 OpenAI API Key
-    baseURL: "http://127.0.0.1:8080/openai/v1", // 指向您的 Proxify 服务
-    // highlight-end
+const openai = new OpenAI({
+  // highlight-start
+  apiKey: "sk-...", // 您的 OpenAI API Key
+  baseURL: "http://127.0.0.1:7777/openai/v1", // 指向您的 Proxify 服务
+  // highlight-end
 });
 async function main() {
-    const stream = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [{ role: "user", content: "你好，请介绍一下自己" }],
-        stream: true,
-    });
-    for await (const chunk of stream) {
-        process.stdout.write(chunk.choices[0]?.delta?.content || "");
-    }
+  const stream = await openai.chat.completions.create({
+    model: "gpt-5",
+    messages: [{ role: "user", content: "hi" }],
+    stream: true,
+  });
+  for await (const chunk of stream) {
+    process.stdout.write(chunk.choices[0]?.delta?.content || "");
+  }
 }
 main();
 ```
 
-
 ## 🖥️ 部署教程
 
-### 方式一：使用 Docker (推荐)
+Proxify 提供多种部署方式。无论您选择哪种方式，请先完成准备工作。
 
-我们强烈推荐使用 Docker 进行部署，这是最简单快捷的方式。
+---
 
-1.  **准备配置文件**
-    在您的服务器上创建一个 `routes.json` 文件，用于定义路由规则。这是一个示例：
-    ```json
+### ⚙️ 准备工作：配置环境与路由
+
+Proxify 项目已经内置了 `.env.example` 与 `routes.json.example` 示例文件。
+您只需复制并稍作修改，即可快速启动。
+
+#### **1. 环境变量配置 (`.env`)**
+
+从示例文件复制：
+
+```bash
+cp .env.example .env
+```
+
+示例内容如下（请根据实际情况修改）：
+
+```env
+# 运行模式：debug | release
+MODE=debug
+
+# 服务监听端口
+PORT=7777
+
+# 可选：GitHub Token（用于访问私有仓库或限流提升）
+GITHUB_TOKEN=ghp_xxxx
+
+# 启用流式优化（平滑输出模式）
+STREAM_SMOOTHING_ENABLED=true
+
+# 启用 SSE 心跳机制（防止长连接超时）
+STREAM_HEARTBEAT_ENABLED=true
+```
+
+> 💡 **提示：**
+>
+> - 当您使用 Docker 运行 Proxify 时，必须将 .env 文件挂载进容器内部路径 /app/.env；
+>
+> - 如果您直接运行本地可执行文件（不使用 Docker），只需保证 .env 与程序位于同一目录即可。
+
+---
+
+#### **2. 路由配置文件 (`routes.json`)**
+
+从示例文件复制：
+
+```bash
+cp routes.json.example routes.json
+```
+
+该文件定义了所有可代理的上游 AI 模型端点。
+
+示例内容如下（可直接使用或新增）：
+
+```json
+{
+  "routes": [
     {
-      "/openai": {
-        "target": "https://api.openai.com"
-      },
-      "/deepseek": {
-        "target": "https://api.deepseek.com"
-      },
-      "/claude": {
-        "target": "https://api.anthropic.com"
-      }
+      "name": "OpenAI",
+      "description": "OpenAI Official API Endpoint",
+      "path": "/openai",
+      "target": "https://api.openai.com/"
+    },
+    {
+      "name": "DeepSeek",
+      "description": "DeepSeek Official API Endpoint",
+      "path": "/deepseek",
+      "target": "https://api.deepseek.com"
+    },
+    {
+      "name": "Claude",
+      "description": "Anthropic Claude Official API Endpoint",
+      "path": "/claude",
+      "target": "https://api.anthropic.com"
+    },
+    {
+      "name": "Gemini",
+      "description": "Google Gemini Official API Endpoint",
+      "path": "/gemini",
+      "target": "https://generativelanguage.googleapis.com"
     }
-    ```
+    ...
+  ]
+}
+```
 
-2.  **运行 Docker 容器**
-    将宿主机的 `routes.json` 文件挂载到容器中，并暴露端口。
+> 💡 **提示：**
+>
+> - 您可在此文件中自由增减代理路径；
+>
+> - 修改后无需重启（路由文件自动热加载）。
+
+---
+
+### 🧾 准备完成后
+
+在确认 `.env` 与 `routes.json` 均配置正确后，
+即可选择以下任意一种部署方式继续操作：
+
+- [🐳 使用 Docker 部署（推荐）](#-方式一使用-docker-推荐)
+- [🛠️ 手动编译运行（开发环境）](#️-方式二手动编译部署)
+
+---
+
+### 🐳 方式一：使用 Docker (推荐)
+
+我们提供了三种便捷的 Docker 部署方案。
+
+#### 1. 从 Docker Hub 拉取镜像 (最简单)
+
+这是最快、最推荐的生产环境部署方式。
+
+```bash
+# 1. 从 Docker Hub 拉取最新镜像
+docker pull terobox/proxify:latest
+
+# 2. 运行容器，并挂载配置文件
+docker run -d \
+  --name proxify \
+  -p 7777:7777 \
+  -v $(pwd)/routes.json:/app/routes.json \
+  -v $(pwd)/.env:/app/.env \
+  --restart=always \
+  poixeai/proxify:latest
+```
+
+#### 2. 使用 Docker Compose (推荐)
+
+通过 `docker-compose.yml` 文件进行声明式部署，便于管理。
+
+1.  **保证 `docker-compose.yml` 文件已创建，且位于当前目录下。**
+
+2.  **启动服务:**
 
     ```bash
-    docker run -d \
-      --name proxify \
-      -p 8080:8080 \
-      -v /path/to/your/routes.json:/app/routes.json \
-      --restart=always \
-      poixeai/proxify:latest
+    # 启动服务
+    docker-compose up -d
+
+    # 查看服务状态
+    docker-compose ps
     ```
-    *   请将 `/path/to/your/routes.json` 替换为您配置文件的实际路径。
-    *   服务将在 `http://<您的服务器IP>:8080` 上运行。
 
-### 方式二：手动编译部署
+#### 3. 从 Dockerfile 构建镜像
 
-如果您希望从源码构建，请按以下步骤操作。
+如果您需要基于最新源码进行自定义构建。
+
+```bash
+# 1. 克隆源码
+git clone https://github.com/poixeai/proxify.git
+cd proxify
+
+# 2. 使用 Dockerfile 构建你自己的镜像 (例如，命名为 my-proxify)
+docker build -t terobox/proxify:latest .
+
+# 3. 运行您刚刚构建的镜像
+docker run -d \
+  --name proxify \
+  -p 7777:7777 \
+  -v $(pwd)/routes.json:/app/routes.json \
+  -v $(pwd)/.env:/app/.env \
+  --restart=always \
+  poixeai/proxify:latest
+```
+
+---
+
+### 🛠️ 方式二：手动编译部署
+
+适用于开发环境或不便使用 Docker 的场景。
 
 **环境要求:**
-*   Go (版本 1.20+)
-*   Node.js (版本 18+)
-*   pnpm (或 npm/yarn)
 
-**步骤:**
+- Go (版本 1.20+)
+- Node.js (版本 18+)
+- pnpm
 
-1.  **克隆仓库**
-    ```bash
-    git clone https://github.com/poixeai/proxify.git
-    cd proxify
-    ```
+#### 1. 使用构建脚本 (推荐)
 
-2.  **编译前端**
-    ```bash
-    cd web
-    pnpm install
-    pnpm build
-    cd ..
-    ```
+我们提供了 `build.sh` 脚本来简化编译流程。
 
-3.  **编译后端**
-    ```bash
-    go build -o proxify .
-    ```
+```bash
+# 1. 克隆源码并进入目录
+git clone https://github.com/poixeai/proxify.git
+cd proxify
 
-4.  **准备配置文件**
-    在可执行文件 `proxify` 同级目录下创建 `routes.json` 文件（内容同上）。
+# 2. 赋予脚本执行权限
+chmod +x build.sh
 
-5.  **运行**
-    ```bash
-    ./proxify
-    ```
-    默认情况下，服务将在 `8080` 端口启动。
+# 3. 执行构建脚本
+./build.sh
 
-## ⚙️ 配置说明
+# 4. 运行编译好的程序
+./bin/proxify
+```
 
-Proxify 主要通过环境变量进行配置。
+#### 2. 完全手动编译
 
-| 环境变量           | 类型    | 默认值          | 描述                                         |
-|--------------------|---------|-----------------|----------------------------------------------|
-| `PROXIFY_PORT`     | `Int`   | `8080`          | 服务监听的端口                               |
-| `PROXIFY_ROUTES`   | `String`| `routes.json`   | 路由配置文件的路径                           |
-| `PROXIFY_TIMEOUT`  | `Int`   | `300`           | 上游请求的超时时间（秒）                       |
-| `PROXIFY_LOG_LEVEL`| `String`| `info`          | 日志级别，可选值: `debug`, `info`, `warn`, `error` |
+如果您想了解完整的构建步骤。
+
+```bash
+# 1. 克隆源码并进入目录
+git clone https://github.com/poixeai/proxify.git
+cd proxify
+
+# 2. 编译前端静态资源
+cd web
+pnpm install
+pnpm build
+cd ..
+
+# 3. 编译后端 Go 程序
+go mod tidy
+go build -o ./bin/proxify .
+
+# 4. 运行程序
+./bin/proxify
+```
 
 ## 🗺️ 广泛兼容的 API 端点
 
 Proxify 支持代理任何 HTTP 服务。以下是一些预设的、经过优化的常用 AI 服务路由示例。
 
-| 服务商      | 建议路径 (Path) | 目标地址 (URL)                           |
-|-------------|-----------------|------------------------------------------|
-| **OpenAI**  | `/openai`       | `https://api.openai.com`                 |
-| **Azure**   | `/azure`        | `https://<your-res>.openai.azure.com`    |
-| **DeepSeek**| `/deepseek`     | `https://api.deepseek.com`               |
-| **Claude**  | `/claude`       | `https://api.anthropic.com`              |
-| **Gemini**  | `/gemini`       | `https://generativelanguage.googleapis.com` |
-| **Grok**    | `/grok`         | `https://api.x.ai`                       |
-| **阿里云**   | `/aliyun`       | `https://dashscope.aliyuncs.com`         |
-| **火山引擎** | `/volcengine`   | `https://ark.cn-beijing.volces.com`      |
+| 服务商       | 建议路径 (Path) | 目标地址 (URL)                              |
+| ------------ | --------------- | ------------------------------------------- |
+| **OpenAI**   | `/openai`       | `https://api.openai.com`                    |
+| **Azure**    | `/azure`        | `https://<your-res>.openai.azure.com`       |
+| **DeepSeek** | `/deepseek`     | `https://api.deepseek.com`                  |
+| **Claude**   | `/claude`       | `https://api.anthropic.com`                 |
+| **Gemini**   | `/gemini`       | `https://generativelanguage.googleapis.com` |
+| **Grok**     | `/grok`         | `https://api.x.ai`                          |
+| **阿里云**   | `/aliyun`       | `https://dashscope.aliyuncs.com`            |
+| **火山引擎** | `/volcengine`   | `https://ark.cn-beijing.volces.com`         |
 
-*注意：实际可用路径取决于您的 `routes.json` 配置文件。*
+_注意：实际可用路径取决于您的 `routes.json` 配置文件。_
 
 ## 🤝 贡献
 
 我们欢迎并感谢所有形式的贡献！无论是提交 Issue、发起 Pull Request，还是改进文档，都是对社区的巨大支持。
 
-请在贡献前阅读我们的《贡献指南》（`CONTRIBUTING.md` - 待创建）。
-
 ## 📄 开源协议
 
 本项目采用 [MIT License](./LICENSE) 开源协议。
-
----
-
-<div align="center">
-  <p>Powered by <a href="https://poixe.com">Poixe AI</a></p>
-</div>
