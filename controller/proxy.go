@@ -35,6 +35,11 @@ func ProxyHandler(c *gin.Context) {
 		req.Header[k] = v
 	}
 
+	// inject OpenAI API key if this is an OpenAI request
+	if openaiKey := os.Getenv("OPENAI_API_KEY"); openaiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+openaiKey)
+	}
+
 	// create client
 	client := &http.Client{
 		Timeout: 0, // no timeout, let ctx control it
